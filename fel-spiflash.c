@@ -488,13 +488,18 @@ void aw_fel_spiflash_info(feldev_handle *dev)
 	case 0xC2:
 		manufacturer = "Macronix";
 		break;
+	case 0x01:
+		manufacturer = "Spasion";
+		break;
 	default:
 		manufacturer = "Unknown";
 		break;
 	}
 
-	printf("Manufacturer: %s (%02Xh), model: %02Xh, size: %d bytes.\n",
-	       manufacturer, buf[3], buf[4], (1 << buf[5]));
+	uint size_bytes = (1 << buf[5]);
+
+	printf("Manufacturer: %s (%02Xh), model: %02Xh, size: %d bytes (%d MB).\n",
+	       manufacturer, buf[3], buf[4], size_bytes, (size_bytes / (1024*1024)));
 }
 
 /*
