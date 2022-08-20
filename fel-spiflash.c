@@ -460,7 +460,7 @@ void aw_fel_spiflash_write(feldev_handle *dev,
 /*
  * Use the read JEDEC ID (9Fh) command.
  */
-void aw_fel_spiflash_info(feldev_handle *dev)
+void aw_fel_spiflash_info(feldev_handle *dev, flash_info_t *flash_info)
 {
 	soc_info_t *soc_info = dev->soc_info;
 	const char *manufacturer;
@@ -500,6 +500,13 @@ void aw_fel_spiflash_info(feldev_handle *dev)
 
 	printf("Manufacturer: %s (%02Xh), model: %02Xh, size: %d bytes (%d MB).\n",
 	       manufacturer, buf[3], buf[4], size_bytes, (size_bytes / (1024*1024)));
+
+	if(flash_info != NULL) {
+		flash_info->manuf_id = buf[3];
+		strcpy(flash_info->manuf_name, manufacturer);
+		flash_info->model_id = buf[4];
+		flash_info->size_bytes = size_bytes;
+	}
 }
 
 /*
@@ -509,5 +516,6 @@ void aw_fel_spiflash_help(void)
 {
 	printf("	spiflash-info			Retrieves basic information\n"
 	       "	spiflash-read addr length file	Write SPI flash contents into file\n"
-	       "	spiflash-write addr file	Store file contents into SPI flash\n");
+	       "	spiflash-write addr file	Store file contents into SPI flash\n"
+		   "	spiflash-flush			Detect and flush SPI flash\n");
 }

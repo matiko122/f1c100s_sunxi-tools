@@ -219,6 +219,12 @@ void *load_file(const char *name, size_t *size)
 	return buf;
 }
 
+void *gen_zero(size_t size)
+{
+	char *buf = calloc(size, sizeof(char));
+	return buf;
+}
+
 void aw_fel_hexdump(feldev_handle *dev, uint32_t offset, size_t size)
 {
 	if (size > 0) {
@@ -1357,7 +1363,7 @@ int main(int argc, char **argv)
 				printf("Warning: \"uboot\" command failed to detect image! Can't execute U-Boot.\n");
 			skip=2;
 		} else if (strcmp(argv[1], "spiflash-info") == 0) {
-			aw_fel_spiflash_info(handle);
+			aw_fel_spiflash_info(handle, NULL);
 		} else if (strcmp(argv[1], "spiflash-read") == 0 && argc > 4) {
 			size_t size = strtoul(argv[3], NULL, 0);
 			void *buf = malloc(size);
@@ -1373,6 +1379,20 @@ int main(int argc, char **argv)
 					      pflag_active ? progress_bar : NULL);
 			free(buf);
 			skip=3;
+		} else if (strcmp(argv[1], "spiflash-flush") == 0) {
+			size_t size;
+			flash_info_t flash_info = { 0 };
+		
+			aw_fel_spiflash_info(handle, &flash_info); // fetch flash info
+			size = flash_info.size_bytes;
+			void *buf = gen_zero(size); // gen bufer
+
+			printf("Created bufer size: %d\n", size);
+
+			aw_fel_spiflash_write(handle, 0, buf, size,
+					      pflag_active ? progress_bar : NULL);
+
+			free(buf);
 		} else {
 			pr_fatal("Invalid command %s\n", argv[1]);
 		}

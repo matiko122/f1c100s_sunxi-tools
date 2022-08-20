@@ -45,6 +45,14 @@ typedef struct {
 	uint32_t SID[4];
 } feldev_list_entry;
 
+/* details about flash chip */
+typedef struct {
+	uint8_t manuf_id;
+	char manuf_name[20];
+	uint8_t model_id;
+	uint32_t size_bytes;
+} flash_info_t;
+
 /* FEL device management */
 
 void feldev_init(void);
